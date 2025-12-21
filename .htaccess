@@ -1,0 +1,17 @@
+# Apache configuration for PHP backend
+# Place this in your project root if using Apache
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Handle PHP files in backend directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Proxy PHP requests to backend
+RewriteRule ^auth/(.*)$ backend/auth/$1 [L]
+RewriteRule ^api/(.*)$ backend/api/$1 [L]
+
+# Allow direct access to backend files
+RewriteRule ^backend/ - [L]
+
