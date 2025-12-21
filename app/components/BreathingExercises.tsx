@@ -16,48 +16,22 @@ interface Exercise {
 
 const exercises: Record<string, Exercise> = {
   '478': {
-    name: '4-7-8 Breathing',
-    description: 'A calming technique that helps reduce anxiety and promote sleep.',
-    steps: [
-      'Exhale completely through your mouth',
-      'Inhale through your nose for 4 counts',
-      'Hold your breath for 7 counts',
-      'Exhale through your mouth for 8 counts',
-      'Repeat 4-8 times'
-    ],
-    inhale: 4,
-    hold: 7,
-    exhale: 8,
-    holdAfter: 0,
+    name: '4-7-8 METHOD',
+    description: 'Neural override for deep relaxation and sleep readiness.',
+    steps: ['Exhale through mouth', 'Inhale nose (4s)', 'Hold (7s)', 'Exhale mouth (8s)', 'Repeat 4 cycles'],
+    inhale: 4, hold: 7, exhale: 8, holdAfter: 0,
   },
   box: {
-    name: 'Box Breathing',
-    description: 'A simple technique used by Navy SEALs to stay calm under pressure.',
-    steps: [
-      'Inhale through your nose for 4 counts',
-      'Hold your breath for 4 counts',
-      'Exhale through your mouth for 4 counts',
-      'Hold your breath for 4 counts',
-      'Repeat 4-6 times'
-    ],
-    inhale: 4,
-    hold: 4,
-    exhale: 4,
-    holdAfter: 4,
+    name: 'BOX BREATHING',
+    description: 'Tactical composure protocol used by elite operators.',
+    steps: ['Inhale (4s)', 'Hold (4s)', 'Exhale (4s)', 'Hold (4s)', 'Repeat 6 cycles'],
+    inhale: 4, hold: 4, exhale: 4, holdAfter: 4,
   },
   calm: {
-    name: 'Calm Breathing',
-    description: 'A gentle breathing exercise for everyday stress relief.',
-    steps: [
-      'Inhale slowly through your nose for 5 counts',
-      'Exhale slowly through your mouth for 5 counts',
-      'Focus on the rhythm of your breath',
-      'Repeat 5-10 times'
-    ],
-    inhale: 5,
-    hold: 0,
-    exhale: 5,
-    holdAfter: 0,
+    name: 'CALM RHYTHM',
+    description: 'General baseline stabilization for daily stress.',
+    steps: ['Slow Inhale (5s)', 'Slow Exhale (5s)', 'Maintain focus', 'Repeat 10 cycles'],
+    inhale: 5, hold: 0, exhale: 5, holdAfter: 0,
   },
 }
 
@@ -72,141 +46,76 @@ export default function BreathingExercises() {
 
   useEffect(() => {
     if (!isActive || !exercise) return
-
     let timer: NodeJS.Timeout
 
     const runCycle = () => {
-      // Inhale phase
-      setCurrentPhase('inhale')
-      setCountdown(exercise.inhale)
-      let timeLeft = exercise.inhale
+      const phases: { phase: typeof currentPhase; duration: number }[] = [
+        { phase: 'inhale', duration: exercise.inhale },
+        { phase: 'hold', duration: exercise.hold },
+        { phase: 'exhale', duration: exercise.exhale },
+        { phase: 'holdAfter', duration: exercise.holdAfter },
+      ].filter(p => p.duration > 0)
 
-      timer = setInterval(() => {
-        timeLeft--
-        setCountdown(timeLeft)
-        if (timeLeft <= 0) {
-          clearInterval(timer)
-          
-          // Hold phase (if applicable)
-          if (exercise.hold > 0) {
-            setCurrentPhase('hold')
-            setCountdown(exercise.hold)
-            timeLeft = exercise.hold
-            
-            timer = setInterval(() => {
-              timeLeft--
-              setCountdown(timeLeft)
-              if (timeLeft <= 0) {
-                clearInterval(timer)
-                
-                // Exhale phase
-                setCurrentPhase('exhale')
-                setCountdown(exercise.exhale)
-                timeLeft = exercise.exhale
-                
-                timer = setInterval(() => {
-                  timeLeft--
-                  setCountdown(timeLeft)
-                  if (timeLeft <= 0) {
-                    clearInterval(timer)
-                    
-                    // Hold after exhale (if applicable)
-                    if (exercise.holdAfter > 0) {
-                      setCurrentPhase('holdAfter')
-                      setCountdown(exercise.holdAfter)
-                      timeLeft = exercise.holdAfter
-                      
-                      timer = setInterval(() => {
-                        timeLeft--
-                        setCountdown(timeLeft)
-                        if (timeLeft <= 0) {
-                          clearInterval(timer)
-                          setCycle(prev => prev + 1)
-                          runCycle()
-                        }
-                      }, 1000)
-                    } else {
-                      setCycle(prev => prev + 1)
-                      runCycle()
-                    }
-                  }
-                }, 1000)
-              }
-            }, 1000)
-          } else {
-            // No hold, go straight to exhale
-            setCurrentPhase('exhale')
-            setCountdown(exercise.exhale)
-            timeLeft = exercise.exhale
-            
-            timer = setInterval(() => {
-              timeLeft--
-              setCountdown(timeLeft)
-              if (timeLeft <= 0) {
-                clearInterval(timer)
-                setCycle(prev => prev + 1)
-                runCycle()
-              }
-            }, 1000)
+      let phaseIndex = 0
+
+      const startPhase = () => {
+        if (!isActive) return
+        const current = phases[phaseIndex]
+        setCurrentPhase(current.phase)
+        setCountdown(current.duration)
+        
+        let timeLeft = current.duration
+        timer = setInterval(() => {
+          timeLeft--
+          setCountdown(timeLeft)
+          if (timeLeft <= 0) {
+            clearInterval(timer)
+            phaseIndex++
+            if (phaseIndex >= phases.length) {
+              setCycle(prev => prev + 1)
+              runCycle()
+            } else {
+              startPhase()
+            }
           }
-        }
-      }, 1000)
+        }, 1000)
+      }
+      startPhase()
     }
 
     runCycle()
-
-    return () => {
-      if (timer) clearInterval(timer)
-    }
+    return () => clearInterval(timer)
   }, [isActive, exercise])
-
-  const handleStart = () => {
-    if (!selectedExercise) return
-    setIsActive(true)
-    setCycle(0)
-  }
-
-  const handleStop = () => {
-    setIsActive(false)
-    setCurrentPhase('inhale')
-    setCountdown(0)
-    setCycle(0)
-  }
 
   const getPhaseText = () => {
     switch (currentPhase) {
-      case 'inhale':
-        return 'Breathe In'
-      case 'hold':
-        return 'Hold'
-      case 'exhale':
-        return 'Breathe Out'
-      case 'holdAfter':
-        return 'Hold'
-      default:
-        return ''
+      case 'inhale': return 'INHALING'
+      case 'hold': return 'HOLDING'
+      case 'exhale': return 'EXHALING'
+      case 'holdAfter': return 'SUSPEND'
+      default: return ''
     }
   }
 
-  const getCircleSize = () => {
-    if (currentPhase === 'inhale') return 'scale-110'
-    if (currentPhase === 'exhale') return 'scale-90'
-    return 'scale-100'
+  const getVisualState = () => {
+    if (currentPhase === 'inhale') return 'scale-[1.3] shadow-[0_0_80px_rgba(163,230,53,0.4)] bg-lime-400'
+    if (currentPhase === 'exhale') return 'scale-[0.8] shadow-none bg-amber-400'
+    return 'scale-100 shadow-[0_0_40px_rgba(0,0,0,0.1)] bg-slate-900'
   }
 
   if (!selectedExercise) {
     return (
-      <div className="space-y-4">
-        <p className="text-gray-600 mb-4">Choose a breathing exercise to begin:</p>
-        <div className="space-y-3">
+      <div className="space-y-6">
+        <p className="text-xs font-[1000] text-slate-400 uppercase tracking-[0.3em] mb-4">Select Respiratory Protocol</p>
+        <div className="space-y-4">
           {Object.entries(exercises).map(([key, ex]) => (
             <button
               key={key}
               onClick={() => setSelectedExercise(key as ExerciseType)}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+              className="w-full p-8 text-left bg-white border-4 border-slate-100 rounded-[2.5rem] hover:border-lime-400 transition-all shadow-xl group"
             >
-              <h3 className="font-semibold text-gray-900">{ex.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{ex.description}</p>
+              <h3 className="text-2xl font-[1000] text-slate-900 uppercase tracking-tighter">{ex.name}</h3>
+              <p className="text-sm text-slate-500 font-bold italic mt-2 group-hover:text-slate-800 transition-colors">{ex.description}</p>
             </button>
           ))}
         </div>
@@ -215,70 +124,70 @@ export default function BreathingExercises() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-xl font-semibold text-gray-900">{exercise.name}</h3>
-          <p className="text-sm text-gray-600">{exercise.description}</p>
-        </div>
+    <div className="space-y-10">
+      <div className="flex justify-between items-start">
+        <header>
+          <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic">{exercise.name}</h3>
+          <div className="h-2 w-16 bg-lime-500 rounded-full mt-2"></div>
+        </header>
         <button
-          onClick={() => {
-            handleStop()
-            setSelectedExercise(null)
-          }}
-          className="text-gray-500 hover:text-gray-700"
+          onClick={() => { setIsActive(false); setSelectedExercise(null); }}
+          className="text-xs font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors"
         >
-          ← Back
+          ← Abort Session
         </button>
       </div>
 
       {!isActive ? (
-        <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-gray-900 mb-2">Instructions:</h4>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-slate-50 p-8 rounded-[3rem] border-4 border-white shadow-inner">
+            <h4 className="text-xs font-[1000] text-slate-400 uppercase tracking-[0.4em] mb-6">Sequence Steps:</h4>
+            <ul className="space-y-3">
               {exercise.steps.map((step, idx) => (
-                <li key={idx}>{step}</li>
+                <li key={idx} className="text-lg font-bold text-slate-700 flex items-center gap-4">
+                  <span className="w-2 h-2 bg-amber-500 rounded-full"></span> {step}
+                </li>
               ))}
             </ul>
           </div>
           <button
-            onClick={handleStart}
-            className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            onClick={() => { setIsActive(true); setCycle(0); }}
+            className="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-[1000] text-xl uppercase tracking-widest shadow-[10px_10px_0px_0px_rgba(163,230,53,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
           >
-            Start Exercise
+            Initiate Sequence
           </button>
         </div>
       ) : (
-        <div className="text-center space-y-6">
-          <div className="flex justify-center">
-            <div
-              className={`w-48 h-48 rounded-full bg-primary-200 flex items-center justify-center transition-transform duration-1000 ${getCircleSize()}`}
-            >
-              <div className="text-center">
-                <div className="text-4xl font-bold text-primary-700 mb-2">
+        <div className="text-center space-y-12 py-10">
+          <div className="flex justify-center items-center h-64">
+            <div className={`w-48 h-48 rounded-full flex items-center justify-center transition-all duration-[3000ms] ease-in-out relative ${getVisualState()}`}>
+              <div className="text-center z-10">
+                <div className="text-6xl font-[1000] text-white drop-shadow-md">
                   {countdown}
                 </div>
-                <div className="text-lg text-primary-600 font-semibold">
+                <div className="text-[10px] text-white font-black tracking-[0.3em] uppercase opacity-80">
                   {getPhaseText()}
                 </div>
               </div>
+              {/* Pulsing ring */}
+              <div className="absolute inset-0 rounded-full border-8 border-white/20 animate-ping"></div>
             </div>
           </div>
           
-          <div className="text-gray-600">
-            Cycle: {cycle + 1}
+          <div className="inline-block bg-slate-900 text-lime-400 px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg">
+            Current Cycle: {cycle + 1}
           </div>
 
-          <button
-            onClick={handleStop}
-            className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold"
-          >
-            Stop Exercise
-          </button>
+          <div>
+            <button
+              onClick={() => { setIsActive(false); setCycle(0); }}
+              className="px-10 py-4 bg-white border-4 border-rose-500 text-rose-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white transition-all"
+            >
+              Terminate Session
+            </button>
+          </div>
         </div>
       )}
     </div>
   )
 }
-

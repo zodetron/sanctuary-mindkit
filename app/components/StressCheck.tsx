@@ -19,9 +19,7 @@ export default function StressCheck() {
     try {
       const response = await fetch(API_ENDPOINTS.gemini, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           stress_level: stressLevel,
@@ -30,83 +28,101 @@ export default function StressCheck() {
       })
 
       const data = await response.json()
-
       if (data.success) {
         setAdvice(data.advice)
       } else {
-        setError(data.message || 'Failed to get advice. Please try again.')
+        setError(data.message || 'Analysis failed. Re-attempt required.')
       }
     } catch (err) {
-      setError('Network error. Please try again.')
+      setError('Connection interrupted. Verify network status.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Stress Intensity Dial */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            How stressed do you feel right now? (1-10)
+          <label className="block text-xs font-[1000] text-slate-400 uppercase tracking-[0.3em] mb-4">
+            Stress Intensity Level
           </label>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col md:flex-row items-center gap-6">
             <input
               type="range"
               min="1"
               max="10"
               value={stressLevel}
               onChange={(e) => setStressLevel(parseInt(e.target.value))}
-              className="flex-1"
+              className="flex-1 w-full h-4 bg-slate-200 rounded-full appearance-none cursor-pointer accent-lime-500 hover:accent-amber-500 transition-all"
             />
-            <span className="text-2xl font-bold text-primary-600 w-12 text-center">
-              {stressLevel}
-            </span>
+            <div className="bg-slate-900 text-white w-16 h-16 flex items-center justify-center rounded-2xl shadow-[6px_6px_0px_0px_rgba(163,230,53,1)]">
+              <span className="text-3xl font-black">{stressLevel}</span>
+            </div>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Low</span>
-            <span>High</span>
+          <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">
+            <span>&gt; Baseline</span>
+            <span>&gt; Critical</span>
           </div>
         </div>
 
-        <div>
-          <label htmlFor="concern" className="block text-sm font-medium text-gray-700 mb-2">
-            What is bothering you?
+        {/* Narrative Input */}
+        <div className="space-y-3">
+          <label htmlFor="concern" className="block text-xs font-[1000] text-slate-400 uppercase tracking-[0.3em]">
+            Detailed Narratives / Concerns
           </label>
           <textarea
             id="concern"
             value={concern}
             onChange={(e) => setConcern(e.target.value)}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition"
-            placeholder="Describe what's causing you stress or anxiety..."
+            className="w-full px-6 py-5 bg-white border-4 border-slate-200 rounded-[2.5rem] font-bold text-slate-800 focus:border-lime-400 focus:ring-0 outline-none transition-all placeholder:text-slate-200 text-lg shadow-inner"
+            placeholder="Document your current mental state..."
           />
         </div>
 
+        {/* Action Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`w-full py-5 rounded-[2rem] font-[1000] text-lg tracking-widest uppercase transition-all duration-300 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1
+            ${loading 
+              ? 'bg-slate-100 text-slate-300' 
+              : 'bg-slate-900 text-white hover:bg-amber-400 hover:text-slate-900'
+            }`}
         >
-          {loading ? 'Getting Advice...' : 'Get Personalized Advice'}
+          {loading ? 'Analyzing Data...' : 'Execute Neural Analysis'}
         </button>
       </form>
 
+      {/* Error Feedback */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-          {error}
+        <div className="p-6 bg-rose-50 border-l-8 border-rose-500 text-rose-700 font-bold italic animate-pulse">
+          &gt;&gt; SYSTEM_ALERT: {error}
         </div>
       )}
 
+      {/* AI Advice Output */}
       {advice && (
-        <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Your Personalized Advice:</h3>
-          <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+        <div className="relative p-10 bg-white rounded-[3.5rem] border-4 border-slate-100 shadow-[20px_20px_40px_-10px_rgba(101,163,13,0.15)] overflow-hidden">
+          {/* Decorative Corner */}
+          <div className="absolute top-0 right-0 h-16 w-16 bg-lime-400 rounded-bl-[4rem] flex items-center justify-center pl-4 pb-4">
+            <span className="text-white text-2xl font-black">AI</span>
+          </div>
+
+          <h3 className="text-sm font-black text-lime-600 uppercase tracking-[0.4em] mb-6">
+            Recommended Protocol:
+          </h3>
+          <div className="text-slate-700 text-xl font-bold leading-relaxed whitespace-pre-wrap">
             {advice}
+          </div>
+          <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-300 font-black uppercase tracking-widest">
+            <span>Scan Complete</span>
+            <span>Ref: {Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
           </div>
         </div>
       )}
     </div>
   )
 }
-

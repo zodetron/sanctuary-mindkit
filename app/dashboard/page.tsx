@@ -15,159 +15,109 @@ export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
 
   useEffect(() => {
-    // Check if user is logged in
-    fetch(API_ENDPOINTS.checkSession, {
-      credentials: 'include',
-    })
+    fetch(API_ENDPOINTS.checkSession, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.logged_in) {
           setUsername(data.username)
           setLoading(false)
-        } else {
-          router.push('/login')
-        }
+        } else { router.push('/login') }
       })
-      .catch(() => {
-        router.push('/login')
-      })
+      .catch(() => { router.push('/login') })
   }, [router])
 
   const handleLogout = async () => {
     try {
-      await fetch(API_ENDPOINTS.logout, {
-        method: 'POST',
-        credentials: 'include',
-      })
+      await fetch(API_ENDPOINTS.logout, { method: 'POST', credentials: 'include' })
       router.push('/')
-    } catch (err) {
-      console.error('Logout error:', err)
-      router.push('/')
-    }
+    } catch (err) { router.push('/') }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="flex flex-col items-center">
+          <div className="h-24 w-24 border-[12px] border-slate-800 border-t-amber-400 rounded-full animate-spin"></div>
+          <h2 className="mt-8 text-white font-black text-2xl tracking-tighter uppercase">Initializing...</h2>
         </div>
       </div>
     )
   }
 
+  const sections = [
+    { id: 'stress', title: 'STRESS CHECK', desc: 'Advanced AI analysis of your neural state.', component: <StressCheck /> },
+    { id: 'breathing', title: 'BREATH WORK', desc: 'Rhythmic patterns to reset your nervous system.', component: <BreathingExercises /> },
+    { id: 'calm', title: 'INSTANT CALM', desc: 'Emergency protocols for immediate tranquility.', component: <InstantCalm /> },
+    { id: 'tips', title: 'DAILY GROWTH', desc: 'High-impact habits for mental elite performance.', component: <DailyTips /> },
+  ]
+
   return (
-    <div className="min-h-screen px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {username}! 👋
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Your personal stress and anxiety management toolkit
-              </p>
+    <div className="min-h-screen bg-[#cbd5e1] bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-slate-300 via-slate-200 to-slate-400 text-slate-900 px-8 py-20 font-sans">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Massive 3D Header */}
+        <header className="bg-white rounded-[3rem] p-12 mb-20 flex flex-col lg:flex-row justify-between items-center gap-8 shadow-[40px_40px_80px_-20px_rgba(101,163,13,0.2),-20px_-20px_60px_rgba(255,255,255,0.8)] border-b-8 border-r-8 border-slate-100">
+          <div className="text-center lg:text-left">
+            <p className="text-lime-600 font-black tracking-[0.4em] text-sm mb-4 uppercase">System Status: Active</p>
+            <h1 className="text-6xl md:text-7xl font-[900] tracking-tight text-slate-900 leading-none">
+              Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-lime-500">{username}.</span>
+            </h1>
+          </div>
+          <button 
+            onClick={handleLogout} 
+            className="group relative px-12 py-5 bg-slate-900 text-white overflow-hidden rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl shadow-slate-400"
+          >
+            <span className="relative z-10 font-black text-lg tracking-widest uppercase">Logout</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+        </header>
+
+        {/* Dashboard Grid with Thick Typography */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          {sections.map((sec) => (
+            <div 
+              key={sec.id} 
+              className={`bg-white rounded-[4rem] p-12 flex flex-col transition-all duration-500 
+                ${activeSection === sec.id 
+                  ? 'shadow-[60px_60px_100px_-20px_rgba(163,230,53,0.3)] scale-[1.03] border-t-4 border-lime-400' 
+                  : 'shadow-[30px_30px_70px_-10px_rgba(101,163,13,0.2),-10px_-10px_50px_rgba(255,255,255,0.5)] hover:shadow-[50px_50px_90px_-10px_rgba(234,179,8,0.25)] hover:-translate-y-4'
+                }`}
+            >
+              <div className="mb-10">
+                <h2 className="text-4xl font-[1000] text-slate-900 mb-4 tracking-tighter uppercase leading-none">
+                  {sec.title}
+                </h2>
+                <div className="h-3 w-24 bg-gradient-to-r from-lime-400 to-amber-400 rounded-full mb-6"></div>
+                <p className="text-xl text-slate-500 font-bold leading-snug italic">
+                  "{sec.desc}"
+                </p>
+              </div>
+              
+              <button
+                onClick={() => setActiveSection(activeSection === sec.id ? null : sec.id)}
+                className={`mt-auto w-full py-6 rounded-3xl font-[900] text-xl tracking-tighter uppercase transition-all duration-500 border-4
+                  ${activeSection === sec.id 
+                    ? 'bg-amber-400 border-amber-400 text-white shadow-inner scale-95' 
+                    : 'bg-white border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1'
+                  }`}
+              >
+                {activeSection === sec.id ? 'Exit Module' : 'Open Module'}
+              </button>
+
+              {/* Heavyweight Expansion Content */}
+              <div className={`transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) overflow-hidden ${
+                activeSection === sec.id ? 'max-h-[1200px] mt-12 opacity-100' : 'max-h-0 opacity-0'
+              }`}>
+                <div className="bg-slate-100/80 rounded-[3rem] p-10 border-4 border-white shadow-inner">
+                  <div className="font-bold text-slate-800">
+                    {sec.component}
+                  </div>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-
-        {/* Dashboard Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Stress Check Section */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Check Your Stress Level
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Assess your current stress level and get personalized AI-powered advice.
-            </p>
-            <button
-              onClick={() => setActiveSection(activeSection === 'stress' ? null : 'stress')}
-              className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              {activeSection === 'stress' ? 'Close' : 'Start Assessment'}
-            </button>
-            {activeSection === 'stress' && (
-              <div className="mt-6">
-                <StressCheck />
-              </div>
-            )}
-          </div>
-
-          {/* Breathing Exercises Section */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Breathing Exercises
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Practice guided breathing techniques to calm your mind and body.
-            </p>
-            <button
-              onClick={() => setActiveSection(activeSection === 'breathing' ? null : 'breathing')}
-              className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              {activeSection === 'breathing' ? 'Close' : 'Start Exercise'}
-            </button>
-            {activeSection === 'breathing' && (
-              <div className="mt-6">
-                <BreathingExercises />
-              </div>
-            )}
-          </div>
-
-          {/* Instant Calm Advice Section */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Instant Calm Advice
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Get quick, actionable advice for immediate relief.
-            </p>
-            <button
-              onClick={() => setActiveSection(activeSection === 'calm' ? null : 'calm')}
-              className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              {activeSection === 'calm' ? 'Close' : 'Get Advice'}
-            </button>
-            {activeSection === 'calm' && (
-              <div className="mt-6">
-                <InstantCalm />
-              </div>
-            )}
-          </div>
-
-          {/* Daily Tips Section */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Daily Mental Health Tips
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Discover daily tips and practices for better mental health.
-            </p>
-            <button
-              onClick={() => setActiveSection(activeSection === 'tips' ? null : 'tips')}
-              className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              {activeSection === 'tips' ? 'Close' : 'View Tips'}
-            </button>
-            {activeSection === 'tips' && (
-              <div className="mt-6">
-                <DailyTips />
-              </div>
-            )}
-          </div>
+          ))}
         </div>
       </div>
     </div>
   )
 }
-
