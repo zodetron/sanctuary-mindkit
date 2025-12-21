@@ -1,108 +1,101 @@
-# Stress & Anxiety Self-Help Toolkit
+# SANCTUARY OS | STRESS & ANXIETY TOOLKIT
+## PROJECT SYNOPSIS
+Sanctuary OS is a high-performance, full-stack mental wellness dashboard. It is engineered to provide immediate physiological and psychological relief through AI-driven insights and tactical breathing protocols. Built with a Soft Brutalist design language, it prioritizes speed, high-contrast scannability, and absolute data security.
 
-A full-stack web application for managing stress and anxiety, built with Next.js (App Router) and PHP.
+## CORE FEATURES
+NEURAL ANALYSIS: Stress assessment powered by Google Gemini AI for personalized recovery strategies.
 
-## Features
+IDENTITY SANCTUARY: Secure authentication using Bcrypt-protected credentials and JSON persistence.
 
-- User authentication (signup/login) with file-based storage
-- Stress level assessment with AI-powered advice
-- Guided breathing exercises
-- Daily mental health tips
-- Instant calm advice
+RESPIRATORY PROTOCOLS: Interactive 4-7-8, Box, and Calm breathing cycles with visual haptic feedback.
 
-## Tech Stack
+GROUNDING LIBRARY: Tactical 5-4-3-2-1 sensory exercises to neutralize acute anxiety loops.
 
-- **Frontend**: Next.js 14 (App Router), React, Tailwind CSS
-- **Backend**: Node.js with Express
-- **Storage**: File-based (JSON files)
-- **AI**: Google Gemini API
+PROTOCOL INDEX: A curated library of daily mental health tips and emergency calm techniques.
 
-## Setup Instructions
+## TECH STACK
+FRONTEND: Next.js 14 (App Router), Tailwind CSS, React.
 
-### 1. Install Dependencies
+BACKEND: Node.js, Express.js.
 
-```bash
-npm install
-```
+SECURITY: Bcrypt.js (Hashing), CORS Middleware.
 
-### 2. Configure Environment
+INTELLIGENCE: Google Gemini Pro API.
 
-Copy `.env.example` to `.env` and update the configuration:
+STORAGE: Lightweight JSON-based File Storage.
 
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and set:
-- `GEMINI_API_KEY`: Your Google Gemini API key (get it from https://makersuite.google.com/app/apikey)
-- `NEXT_PUBLIC_API_BASE_URL`: The URL of your backend server (default: http://localhost:8000)
-- `BACKEND_PORT`: Backend server port (default: 8000)
-- `FRONTEND_URL`: Frontend URL for CORS (default: http://localhost:3000)
-- `SESSION_SECRET`: Secret key for sessions (change in production)
-
-### 3. Start Development Servers
-
-**Option 1: Run both servers together (recommended)**
-```bash
-npm run dev:all
-```
-
-**Option 2: Run servers separately**
-
+## SETUP & INSTALLATION
 Terminal 1 - Backend:
 ```bash
+npm install
 npm run dev:backend
 ```
 
 Terminal 2 - Frontend:
 ```bash
+cd app
 npm run dev
 ```
 
 The backend will run on `http://localhost:8000` and frontend on `http://localhost:3000`
 
-### 4. Directory Permissions
+# AI INTELLIGENCE
+GEMINI_API_KEY=your_api_key_here
 
-The `backend-node/data/` directory will be created automatically. No special permissions needed on Windows.
+# CONNECTIVITY
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+BACKEND_PORT=8000
+FRONTEND_URL=http://localhost:3000
 
-## Project Structure
+# SECURITY
+SESSION_SECRET=high_entropy_string_here
+
+EXECUTION
+Option A: Unified Launch (Recommended)
+
+Bash
+
+npm run dev:all
+
+Option B: Manual Orchestration
+
+Backend: npm run dev:backend (Port 8000)
+
+Frontend: npm run dev (Port 3000)
+
+## SYSTEM ARCHITECTURE
 
 ```
-├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Landing page
-│   ├── login/             # Login page
-│   ├── signup/            # Signup page
-│   ├── dashboard/         # Dashboard page (protected)
-│   ├── components/        # React components
-│   │   ├── StressCheck.tsx
-│   │   ├── BreathingExercises.tsx
-│   │   ├── DailyTips.tsx
-│   │   └── InstantCalm.tsx
-│   └── lib/               # Utilities
-│       └── api.ts         # API endpoint configuration
-├── backend-node/          # Node.js backend
-│   ├── routes/           # Express routes
-│   │   ├── auth.js      # Authentication routes
-│   │   └── api.js       # API routes (Gemini)
-│   ├── utils/           # Utilities
-│   │   └── storage.js   # File-based storage helpers
-│   └── data/            # Data storage (users.json auto-created)
-├── server.js            # Express server entry point
-├── public/               # Static assets
-└── package.json
+├── app/                  # Next.js App Router (80% Global Scale)
+│   ├── dashboard/        # Secure Wellness Hub
+│   ├── components/       # Soft Brutalist UI Modules
+│   └── lib/              # API Client Logic
+├── backend-node/         # Express.js Server
+│   ├── routes/           # Auth & AI Endpoints
+│   ├── utils/            # JSON Storage Helpers
+│   └── data/             # Persistent User Store (users.json)
+└── globals.css           # Soft Brutalist Design System
 ```
 
-## Security Notes
+## SECURITY & DATA INTEGRITY
+ENCRYPTION: User passwords are never stored in plain text. Sanctuary OS uses Bcrypt with a workload factor of 10 to ensure high-resistance against brute-force attacks.
 
-- Passwords are hashed using bcrypt
-- Inputs are sanitized
-- Session-based authentication with express-session
-- **Important**: 
-  - Replace the example API key with a real one in production
-  - Change SESSION_SECRET in .env for production
-  - Enable HTTPS in production and set secure cookies
+CORS POLICY: The backend is locked to the specific frontend origin, preventing unauthorized cross-site API interaction.
 
-## License
+AI PERSONA: Gemini API requests are wrapped in a specific counseling persona to ensure responses are clinical, empathetic, and safe.
 
-MIT
+## DESIGN SPECIFICATIONS
+SCALE: The entire UI is scaled to 80% via root font-size adjustment for an information-dense, editorial look.
 
+PALETTE:
+
+Slate-900: Primary Text & Void
+
+Lime-500: System Active / Growth
+
+Amber-500: Warning / Release
+
+Rose-500: System Abort
+
+## LICENSE
+MIT - Open Sanctuary Protocol.
