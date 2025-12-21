@@ -64,8 +64,8 @@ Please provide:
 Keep the response concise, warm, and practical. Format it in a friendly, supportive tone.`;
 
     // Prepare API request
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+    
     const requestData = {
       contents: [
         {
